@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Breathing Timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #363636;
+    }
+
+    .sound-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 2rem;
+      color: #fff;
+      z-index: 10;
+    }
+
+    .sound-toggle.muted {
+      color: #999;
+    }
+
+    .custom-dropdown {
+      position: relative;
+      width: 120px;
+      margin-bottom: 3rem;
+      font-size: 1.1rem;
+      z-index: 9999;
+    }
+
+    .custom-dropdown .selected {
+      background-color: #555;
+      padding: 0.6rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .custom-dropdown .caret {
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+      margin-left: 10px;
+    }
+
+    .custom-dropdown .menu {
+      position: absolute;
+      top: 110%;
+      left: 0;
+      width: 100%;
+      background-color: #444;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      display: none;
+      flex-direction: column;
+      z-index: 10000;
+      color: white;
+    }
+
+    .custom-dropdown .menu div {
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .custom-dropdown .menu div:hover {
+      background-color: #555;
+    }
+
+    .custom-dropdown.open .menu {
+      display: flex;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      z-index: 1;
+    }
+
+    .circle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: conic-gradient(#222 0%, #222 100%);
+      z-index: 1;
+    }
+
+    .circle::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: #222;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .circle::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      background: #333;
+      border: 15px solid #4d4c51;
+      border-radius: 50%;
+      box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.25),
+                  0 10px 10px rgba(0, 0, 0, 0.75),
+                  0 -2px 2px rgba(255, 255, 255, 0.5),
+                  inset 0 4px 2px rgba(0, 0, 0, 0.25),
+                  inset 0 -2px 2px rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .circle .number {
+      position: relative;
+      color: #fff;
+      font-size: 3em;
+      z-index: 10;
+    }
+
+    .circle h4 {
+      position: relative;
+      color: #fff;
+      z-index: 10;
+      font-weight: 500;
+      font-size: 1.2em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    #resetBtn {
+      margin-top: 40px;
+      padding: 10px 80px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 20px;
+      background-color: #e74c3c;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+    }
+
+    #resetBtn:hover {
+      background-color: #c0392b;
+    }
+
+    .cycle-count {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin-top: 2.5rem;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .cycle-count span {
+      opacity: 0.8;
+    }
+
+    .cycle-count strong {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+<h1 style="color: white; margin-bottom: 3rem; text-align: center;">திருமூலர் Pranayamam</h1>
+
+<div class="sound-toggle" id="soundToggle">
+  🔊
+</div>
+
+<div class="custom-dropdown" id="dropdown">
+  <div class="selected">Easy <span class="caret"></span></div>
+  <div class="menu">
+    <div data-diff="easy">Easy</div>
+    <div data-diff="medium">Medium</div>
+    <div data-diff="hard">Hard</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="circle" id="inhalePhase" data-color="#0fdbb6">
+    <h2 class="number">8</h2>
+    <h4>INHALE</h4>
+  </div>
+</div>
+
+<div class="cycle-count" id="cycleCount">
+  <span>Cycle :</span> <strong id="cycleNumber">0</strong>
+</div>
+
+<button id="resetBtn">Reset</button>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const patterns = {
+      easy: { Inhale: 8, Hold: 16, Exhale: 8 },
+      medium: { Inhale: 16, Hold: 32, Exhale: 22 },
+      hard: { Inhale: 16, Hold: 64, Exhale: 32 }
+    };
+
+    const RELAX_TIME = 10;
+
+    let difficulty = 'easy';
+    let dropdown = document.querySelector("#dropdown");
+    let selected = dropdown.querySelector(".selected");
+    let menu = dropdown.querySelector(".menu");
+
+    selected.addEventListener("click", () => {
+      dropdown.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove("open");
+      }
+    });
+
+    menu.querySelectorAll("div").forEach(option => {
+      option.addEventListener("click", () => {
+        difficulty = option.getAttribute("data-diff");
+        selected.innerHTML = `${option.innerText} <span class="caret"></span>`;
+        dropdown.classList.remove("open");
+        restartCycle();
+      });
+    });
+
+    let intervalRef = null;
+    let cycle = 0;
+    const cycleDisplay = document.getElementById("cycleNumber");
+
+    const phaseSounds = {
+      inhale: new Audio('https://ganesh.staticrun.app/Inhale.mp3'),
+      hold: new Audio('https://ganesh.staticrun.app/Hold.mp3'),
+      exhale: new Audio('https://ganesh.staticrun.app/Exhale.mp3'),
+      relax: new Audio('https://ganesh.staticrun.app/Relax.mp3'),
+    };
+
+    let soundEnabled = true;
+
+    const playPhaseSound = (phase) => {
+      if (soundEnabled && phaseSounds[phase]) {
+        phaseSounds[phase].currentTime = 0;
+        phaseSounds[phase].play();
+      }
+    };
+
+    const updateCircle = (phase, duration) => {
+      return new Promise(resolve => {
+        let circle = document.querySelector('#inhalePhase');
+        let number = circle.querySelector('.number');
+        let step = 100 / duration;
+        let progress = 0;
+        let current = duration;
+
+        circle.querySelector('h4').innerHTML = phase;
+        let color =
+          phase === 'INHALE' ? '#08fc34' :
+          phase === 'HOLD' ? '#fc0303' :
+          phase === 'EXHALE' ? '#fcc20f' :
+          '#0077ff';
+
+        circle.setAttribute('data-color', color);
+
+        clearInterval(intervalRef);
+
+        playPhaseSound(phase.toLowerCase());
+
+        intervalRef = setInterval(() => {
+          if (current < 0) {
+            clearInterval(intervalRef);
+            return resolve();
+          }
+
+          progress += step;
+          number.innerHTML = current;
+          number.style.color = color;
+          circle.style.background = `conic-gradient(${color} ${progress}%, #222 0%)`;
+          current--;
+        }, 1000);
+      });
+    };
+
+    const breathingCycle = async () => {
+      const { Inhale, Hold, Exhale } = patterns[difficulty];
+      await updateCircle('INHALE', Inhale);
+      await updateCircle('HOLD', Hold);
+      await updateCircle('EXHALE', Exhale);
+      await updateCircle('RELAX', RELAX_TIME);
+      cycle++;
+      cycleDisplay.textContent = cycle;
+      breathingCycle();
+    };
+
+    const restartCycle = () => {
+      clearInterval(intervalRef);
+      const circle = document.getElementById('inhalePhase');
+      circle.style.background = `conic-gradient(#222 0%, #222 100%)`;
+      circle.querySelector('.number').textContent = "0";
+      circle.querySelector('h4').textContent = "INHALE";
+      cycle = 0;
+      cycleDisplay.textContent = cycle;
+      breathingCycle();
+    };
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      // Sound removed here
+      restartCycle();
+    });
+
+    document.getElementById('soundToggle').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      const soundToggleButton = document.getElementById('soundToggle');
+      soundToggleButton.classList.toggle('muted', !soundEnabled);
+      soundToggleButton.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    breathingCycle();
+  });
+</script>
+
+</body>
+</html>
