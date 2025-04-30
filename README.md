@@ -4,20 +4,20 @@ This is a web-based and Android-compatible breathing application inspired by **T
 
 ## 🌐 Live Demo
 
-👉 [Click here to try the app](https://ganeshbabujr.github.io/Breathing-Application/)
+👉 [Click here to try the Web app](https://ganeshbabujr.github.io/Breathing-Application/)
 
 ## 🌟 Features
 
 - 🌬️ **Guided Breathing Cycles** based on Thirumoolar’s pranayama principles  
 - ⭕ **Animated Circular Progress Bar** using conic-gradient for visual rhythm  
 - 🎧 **Audio Cues** for inhale, hold, exhale, and relax phases  
-- 📱 **Android APK Available** *(link below)*  
+- 📱 **Android APK Available** for offline breathing practice  
 - 🔄 **Synced Timers and Audio** for better practice flow  
 - ⚡ **Lightweight and Responsive Design** (HTML, CSS, JavaScript)
 
 ## 📱 Download the Android APK
 
-
+[Download APK](https://ganeshbabujr.github.io/app-release.apk)
 
 ## 🧠 About Thirumoolar Pranayama
 
@@ -32,11 +32,11 @@ This is a web-based and Android-compatible breathing application inspired by **T
 
 ## 🚀 Getting Started Locally
 
-
 Clone this repository:
 
 git clone https://github.com/ganeshbabujr/Breathing-Application.git
 cd Breathing-Application
+
 
 📦 APK Build Instructions
 Download the APK from the link above
